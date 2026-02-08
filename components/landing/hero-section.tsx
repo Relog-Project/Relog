@@ -8,7 +8,7 @@ export function HeroSection() {
       <div className="mb-6 inline-flex items-center rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-muted-foreground">
         B2B 관계 관리의 새로운 기준
       </div>
-      <h1 className="max-w-3xl text-balance text-5xl font-semibold leading-tight tracking-tight text-foreground md:text-6xl">
+      <h1 className="text-balance text-5xl font-semibold leading-tight tracking-tight text-foreground md:text-6xl">
         연락처가 아니라{" "}
         <span className="text-primary">관계</span>를 기록하세요
       </h1>

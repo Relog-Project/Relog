@@ -1,18 +1,122 @@
 @import "tailwindcss";
 
+@theme {
+  /* Custom Primary Color */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+
+  /* Semantic Color Mapping */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
 :root {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
-  --border: 0 0% 89.8%;
+  /* Light Mode Semantic Mapping - Using Tailwind Zinc for Neutrals */
+  --background: var(--color-white);
+  --foreground: var(--color-zinc-950);
+
+  --card: var(--color-white);
+  --card-foreground: var(--color-zinc-950);
+
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-zinc-950);
+
+  --primary: var(--color-primary-600);
+  --primary-foreground: var(--color-white);
+
+  --secondary: var(--color-zinc-100);
+  --secondary-foreground: var(--color-zinc-900);
+
+  --muted: var(--color-zinc-100);
+  --muted-foreground: var(--color-zinc-500);
+
+  --accent: var(--color-zinc-100);
+  --accent-foreground: var(--color-zinc-900);
+
+  --destructive: var(--color-red-500);
+  --destructive-foreground: var(--color-white);
+
+  --border: var(--color-zinc-200);
+  --input: var(--color-zinc-200);
+  --ring: var(--color-primary-600);
+
+  --radius: 0.5rem;
 }
 
 .dark {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --border: 0 0% 14.9%;
+  /* Dark Mode Semantic Mapping - Using Tailwind Zinc for Neutrals */
+  --background: var(--color-zinc-950);
+  --foreground: var(--color-zinc-50);
+
+  --card: var(--color-zinc-900);
+  --card-foreground: var(--color-zinc-50);
+
+  --popover: var(--color-zinc-900);
+  --popover-foreground: var(--color-zinc-50);
+
+  --primary: var(--color-primary-500);
+  --primary-foreground: var(--color-white);
+
+  --secondary: var(--color-zinc-800);
+  --secondary-foreground: var(--color-zinc-50);
+
+  --muted: var(--color-zinc-800);
+  --muted-foreground: var(--color-zinc-400);
+
+  --accent: var(--color-zinc-800);
+  --accent-foreground: var(--color-zinc-50);
+
+  --destructive: var(--color-red-900);
+  --destructive-foreground: var(--color-white);
+
+  --border: var(--color-zinc-800);
+  --input: var(--color-zinc-800);
+  --ring: var(--color-primary-500);
 }
 
-body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
