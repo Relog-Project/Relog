@@ -1,20 +1,19 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import { DialogFooter, DialogHeader } from "@/src/components/ui/dialog";
-import { Input } from "@/src/components/ui/input";
-import { Textarea } from "@/src/components/ui/textarea";
-import { IWork } from "@/src/types/works";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-} from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-label";
-import React from "react";
-
-import { useState } from "react";
+} from "@/src/components/ui/dialog";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { Textarea } from "@/src/components/ui/textarea";
+import { IWork } from "@/src/types/works";
+import React, { useState } from "react";
 
 export function AddWorkModal({
   open,
@@ -47,15 +46,15 @@ export function AddWorkModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>작업 추가</DialogTitle>
           <DialogDescription>
-            이 연락처와의 새로운 작업을 기록하세요.
+            이 연락처와의 새로운 작업을 기록하세요. 모든 필드를 입력한 후 저장을 누르세요.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
+        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          <div className="grid gap-2">
             <Label htmlFor="work-title">작업명</Label>
             <Input
               id="work-title"
@@ -66,7 +65,7 @@ export function AddWorkModal({
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
+            <div className="grid gap-2">
               <Label htmlFor="start-date">시작일</Label>
               <Input
                 id="start-date"
@@ -76,7 +75,7 @@ export function AddWorkModal({
                 required
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="grid gap-2">
               <Label htmlFor="end-date">종료일</Label>
               <Input
                 id="end-date"
@@ -86,21 +85,21 @@ export function AddWorkModal({
               />
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="grid gap-2">
             <Label htmlFor="work-description">설명</Label>
             <Textarea
               id="work-description"
               placeholder="작업에 대한 설명을 입력하세요..."
-              rows={3}
+              className="min-h-[100px]"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               취소
             </Button>
-            <Button type="submit">저장</Button>
+            <Button type="submit">작업 저장</Button>
           </DialogFooter>
         </form>
       </DialogContent>

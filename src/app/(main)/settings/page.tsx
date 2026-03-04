@@ -5,7 +5,7 @@ import { getUserById } from '@/src/features/users/services/get-user-by-id';
 import { createClient } from '@/src/utils/supabase/server';
 import { Label } from '@radix-ui/react-label';
 import { redirect } from 'next/navigation';
-import { LogoutButton } from './logout-button';
+import { LogoutButton } from '../../../features/settings/components/logout-button';
 
 export default async function SettingsPage() {
   const supabase = await createClient();

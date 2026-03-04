@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/contacts", label: "Contacts", icon: Users },
-  { href: "/dashboard/works", label: "Works", icon: Briefcase },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/contacts", label: "Contacts", icon: Users },
+  { href: "/works", label: "Works", icon: Briefcase },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 interface AppSidebarProps {
