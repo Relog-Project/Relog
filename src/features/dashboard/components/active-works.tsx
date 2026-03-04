@@ -1,8 +1,10 @@
-import { contacts } from '@/src/mocks/contacts';
-import { works } from '@/src/mocks/works';
+import { createClient } from '@/src/utils/supabase/server';
+import { getWorks } from '@/src/features/works/services/get-works';
 
-export default function ActiveWorks() {
-  const activeWorks = works.filter((w) => !w.endDate);
+export default async function ActiveWorks() {
+  const supabase = await createClient();
+  const works = await getWorks(supabase);
+  const activeWorks = (works || []).filter((w: any) => !w.endDate);
 
   return (
     <div className="rounded-xl border border-border bg-card">
@@ -17,8 +19,8 @@ export default function ActiveWorks() {
             진행 중인 작업이 없습니다.
           </div>
         ) : (
-          activeWorks.map((work) => {
-            const contact = contacts.find((c) => c.id === work.contactId);
+          activeWorks.map((work: any) => {
+            const contact = work.contacts;
             return (
               <div key={work.id} className="px-6 py-4">
                 <div className="flex items-center justify-between">
@@ -30,7 +32,7 @@ export default function ActiveWorks() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {contact?.name} · {contact?.company} · {work.startDate}
+                  {contact?.name} · {contact?.company || '-'} · {new Date(work.startDate).toLocaleDateString()}
                   부터
                 </p>
               </div>
