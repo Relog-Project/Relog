@@ -1,7 +1,7 @@
-import { FeaturesSection } from "../features/landing/components/features-section";
-import { HeroSection } from "../features/landing/components/hero-section";
-import { LandingFooter } from "../features/landing/components/landing-footer";
-import { LandingNav } from "../features/landing/components/landing-nav";
+import { FeaturesSection } from '../features/landing/components/features-section';
+import { HeroSection } from '../features/landing/components/hero-section';
+import { LandingFooter } from '../components/layout/landing/landing-footer';
+import { LandingNav } from '../components/layout/landing/landing-nav';
 
 export default function Page() {
   return (

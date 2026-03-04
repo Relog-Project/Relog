@@ -1,7 +1,7 @@
-import { DashboardHeader } from "@/src/features/dashboard/components/dashboad-header";
-import { contacts } from "@/src/mocks/contacts";
-import { works } from "@/src/mocks/works";
-import Link from "next/link";
+import { DashboardHeader } from '@/src/components/layout/dashboard/dashboad-header';
+import { contacts } from '@/src/mocks/contacts';
+import { works } from '@/src/mocks/works';
+import Link from 'next/link';
 
 export default function WorksPage() {
   const sortedWorks = [...works].sort(
@@ -67,7 +67,7 @@ export default function WorksPage() {
                         {work.startDate}
                       </td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {work.endDate || "-"}
+                        {work.endDate || '-'}
                       </td>
                       <td className="px-6 py-4">
                         {work.endDate ? (

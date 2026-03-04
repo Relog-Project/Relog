@@ -1,8 +1,8 @@
-import { Button } from "@/src/components/ui/button";
-import { DashboardHeader } from "@/src/features/dashboard/components/dashboad-header";
-import { contacts } from "@/src/mocks/contacts";
-import { Plus } from "lucide-react";
-import Link from "next/link";
+import { Button } from '@/src/components/ui/button';
+import { DashboardHeader } from '@/src/components/layout/dashboard/dashboad-header';
+import { contacts } from '@/src/mocks/contacts';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ContactsPage() {
   return (
