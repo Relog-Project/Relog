@@ -5,11 +5,13 @@ export const login = async (
   supabaseClient: SupabaseClient,
   email: string,
   password: string,
+  rememberMe: boolean = false,
 ) => {
   const { data, error } = await loginQueryBuilder(
     supabaseClient,
     email,
     password,
+    rememberMe,
   );
 
   if (error) {

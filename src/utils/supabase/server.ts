@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export async function createClient() {
+export async function createClient(rememberMe: boolean = false) {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -14,12 +14,16 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // 자동 로그인이 체크된 경우 만료 시간을 30일로 연장
+              const extendedOptions = rememberMe
+                ? { ...options, maxAge: 60 * 60 * 24 * 30 }
+                : options;
+
+              cookieStore.set(name, value, extendedOptions);
+            });
           } catch {
             // Server Component에서 setAll이 호출된 경우 무시
-            // 미들웨어에서 세션을 갱신하도록 처리되어 있다면 동작에 문제가 없습니다.
           }
         },
       },

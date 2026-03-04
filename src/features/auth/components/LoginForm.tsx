@@ -5,21 +5,22 @@ import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { signupAction } from '../actions/signup';
+import { LoginAction } from '../actions/login';
 
-export default function SignUp() {
+export default function LoginForm() {
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (formData: FormData) => {
     setMessage(null);
     startTransition(async () => {
-      const result = await signupAction(formData);
+      const result = await LoginAction(formData);
       if (result?.error) {
         setMessage(result.error);
       }
     });
   };
+
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
@@ -30,7 +31,7 @@ export default function SignUp() {
           Relog
         </Link>
         <p className="mt-2 text-sm text-muted-foreground">
-          새 계정을 만들어보세요
+          계정에 로그인하세요
         </p>
       </div>
       <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
@@ -40,16 +41,6 @@ export default function SignUp() {
               {message}
             </div>
           )}
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name">이름</Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="홍길동"
-              required
-            />
-          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">이메일</Label>
             <Input
@@ -61,7 +52,15 @@ export default function SignUp() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password">비밀번호</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">비밀번호</Label>
+              <Link
+                href="/reset-password"
+                className="text-xs font-medium text-muted-foreground hover:text-primary hover:underline"
+              >
+                비밀번호를 잊으셨나요?
+              </Link>
+            </div>
             <Input
               id="password"
               name="password"
@@ -70,18 +69,32 @@ export default function SignUp() {
               required
             />
           </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              name="rememberMe"
+              className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
+            />
+            <label
+              htmlFor="rememberMe"
+              className="text-sm font-medium leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              자동 로그인
+            </label>
+          </div>
           <Button type="submit" className="mt-1 w-full" disabled={isPending}>
-            {isPending ? '가입 중...' : '무료로 시작하기'}
+            {isPending ? '로그인 중...' : '로그인'}
           </Button>
         </form>
       </div>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        이미 계정이 있으신가요?{' '}
+        계정이 없으신가요?{' '}
         <Link
-          href="/login"
+          href="/signup"
           className="font-medium text-primary hover:underline"
         >
-          로그인
+          회원가입
         </Link>
       </p>
     </div>

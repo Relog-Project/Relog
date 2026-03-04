@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { resetPasswordAction } from '../actions/reset.password';
 
-export default function ResetPassword() {
+export default function ResetPasswordForm() {
   const [message, setMessage] = useState<{
     text: string;
     type: 'error' | 'success';
