@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/src/components/ui/button";
+import { Button } from '@/src/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,12 +8,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/src/components/ui/dialog";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import { Textarea } from "@/src/components/ui/textarea";
-import React, { useState, useTransition } from "react";
-import { addWorkAction } from "../../works/actions/add-work";
+} from '@/src/components/ui/dialog';
+import { Input } from '@/src/components/ui/input';
+import { Label } from '@/src/components/ui/label';
+import { Textarea } from '@/src/components/ui/textarea';
+import React, { useState, useTransition } from 'react';
+import { addWorkAction } from '../../works/actions/add-work';
 
 export function AddWorkModal({
   open,
@@ -27,10 +27,10 @@ export function AddWorkModal({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [description, setDescription] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,10 +48,10 @@ export function AddWorkModal({
       if (result.error) {
         setError(result.error);
       } else {
-        setTitle("");
-        setStartDate("");
-        setEndDate("");
-        setDescription("");
+        setTitle('');
+        setStartDate('');
+        setEndDate('');
+        setDescription('');
         onClose();
       }
     });
@@ -59,7 +59,7 @@ export function AddWorkModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>작업 추가</DialogTitle>
           <DialogDescription>
@@ -108,17 +108,22 @@ export function AddWorkModal({
             <Textarea
               id="work-description"
               placeholder="작업에 대한 설명을 입력하세요..."
-              className="min-h-[100px]"
+              className="min-h-25"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isPending}
+            >
               취소
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "저장 중..." : "작업 저장"}
+              {isPending ? '저장 중...' : '작업 저장'}
             </Button>
           </DialogFooter>
         </form>

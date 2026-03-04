@@ -11,9 +11,11 @@ export const getWorksByContactIdQueryBuilder = (
   supabaseClient: SupabaseClient,
   contactId: string,
 ) => {
+  // contactId를 숫자로 변환하여 DB의 int8 타입과 맞춤
+  const id = Number(contactId);
   return supabaseClient
     .from('works')
     .select('*')
-    .eq('contactId', contactId)
+    .eq('contactId', id)
     .order('startDate', { ascending: false });
 };

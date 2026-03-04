@@ -9,12 +9,15 @@ export default async function ContactDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  console.log('Fetching detail for contact ID:', id);
   const supabase = await createClient();
 
   const [contact, contactWorks] = await Promise.all([
     getContactById(supabase, id),
     getWorksByContactId(supabase, id),
   ]);
+
+  console.log('Fetched works for this contact:', contactWorks?.length || 0);
 
   if (!contact) {
     return (
