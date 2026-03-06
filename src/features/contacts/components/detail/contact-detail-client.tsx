@@ -18,7 +18,7 @@ export default function ContactDetailClient({
   return (
     <div>
       <ContactDetailHeader contact={contact} setShowModal={setShowModal} />
-      <div className="grid gap-8 p-8 lg:grid-cols-3">
+      <div className="grid gap-6 p-4 md:p-8 lg:grid-cols-3 lg:gap-8">
         <ContactDetailInfo contact={contact} />
         <ContactWorkHistory contactWorks={initialWorks} />
       </div>

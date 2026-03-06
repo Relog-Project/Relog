@@ -28,7 +28,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
   const initial = name.charAt(0) || "U";
 
   return (
-    <aside className="flex h-screen w-60 flex-col border-r border-border bg-sidebar">
+    <aside className="hidden md:flex h-screen w-64 flex-col border-r border-border bg-sidebar">
       <div className="flex h-16 items-center border-b border-sidebar-border px-6">
         <Link
           href="/dashboard"

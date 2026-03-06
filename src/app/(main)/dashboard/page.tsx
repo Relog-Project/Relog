@@ -10,9 +10,9 @@ export default function DashboardPage() {
         title="Dashboard"
         description="관계와 작업 현황을 한눈에 확인하세요."
       />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <GeneralSummary />
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="mt-6 md:mt-8 grid gap-6 lg:grid-cols-2">
           <RecentContacts />
           <ActiveWorks />
         </div>
