@@ -7,13 +7,23 @@ function AuthSuccessContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // ✅ 쿠키 대신 URL 파라미터에서 바로 읽기
     const app_redirect = searchParams.get('app_redirect');
-    console.log('app_redirect:', app_redirect); // 디버깅
+    if (!app_redirect) return;
 
-    if (app_redirect) {
-      window.location.href = `${app_redirect}?status=success`;
-    }
+    const getToken = async () => {
+      // ✅ 서버에서 토큰 가져오기
+      const res = await fetch('/api/auth/token');
+      const data = await res.json();
+      console.log('token data:', data); // 디버깅
+
+      if (data.token) {
+        window.location.href = `${app_redirect}?status=success&token=${encodeURIComponent(data.token)}`;
+      } else {
+        window.location.href = `${app_redirect}?status=success`;
+      }
+    };
+
+    getToken();
   }, [searchParams]);
 
   return (
