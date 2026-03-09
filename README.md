@@ -1,6 +1,8 @@
 # 1. ngrok 실행
 ngrok http 3000
 
+ngrok http --domain=untroubled-stoichiometrically-elinore.ngrok-free.dev 3000
+
 # 2. 출력된 URL 복사
 # https://xxxx.ngrok-free.app
 

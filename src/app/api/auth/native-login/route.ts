@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
   // ✅ app_redirect를 callbackUrl 쿼리 파라미터로 전달 (쿠키 X)
   const callbackUrl = `${process.env.NEXTAUTH_URL}/auth-success?app_redirect=${encodeURIComponent(app_redirect)}`;
 
+  console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+  console.log('callbackUrl:', callbackUrl);
+
   const html = `
     <!DOCTYPE html>
     <html>

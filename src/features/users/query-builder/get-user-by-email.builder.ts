@@ -1,12 +1,12 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
-export const getUserByIdQueryBuilder = (
+export const getUserByEmailQueryBuilder = (
   supabaseClient: SupabaseClient,
-  id: string,
+  email: string,
 ) => {
   return supabaseClient
     .from("users")
     .select("*")
-    .eq("id", id)
+    .eq("email", email)
     .single();
 };
