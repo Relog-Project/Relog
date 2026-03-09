@@ -3,6 +3,8 @@ import { updateSession } from '@/src/utils/supabase/middleware';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
   // 1. NextAuth 세션 확인
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
@@ -11,12 +13,14 @@ export async function middleware(request: NextRequest) {
 
   // 3. 인증 체크가 필요한 페이지 (예: dashboard, contacts, settings, works 등)
   const isProtectedPath = ['/dashboard', '/contacts', '/settings', '/works'].some(path => 
-    request.nextUrl.pathname.startsWith(path)
+    pathname.startsWith(path)
   );
 
-  if (isProtectedPath) {
+  // 4. 앱 로그인을 위한 중간 경로는 무조건 통과 (보안상의 이유로 추가적인 로직이 필요할 수 있지만 여기서는 통과시킵니다)
+  const isAuthInternalPath = pathname.startsWith('/api/auth/native-login') || pathname.startsWith('/auth/native-signin');
+
+  if (isProtectedPath && !isAuthInternalPath) {
     // NextAuth 토큰이 있거나 Supabase 사용자 세션이 있으면 통과
-    // (updateSession에서 Supabase 세션 체크가 실패할 수 있으므로 토큰 여부 우선 확인)
     if (token) {
       return NextResponse.next();
     }

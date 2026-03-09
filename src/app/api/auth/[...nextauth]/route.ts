@@ -1,22 +1,22 @@
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { createClient } from "@/src/utils/supabase/server";
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { createClient } from '@/src/utils/supabase/server';
 
 const handler = NextAuth({
   providers: [
     // 소셜 로그인: Google (필요한 경우 설정)
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     }),
-    
+
     // 일반 로그인 (Email/Password)
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -29,7 +29,7 @@ const handler = NextAuth({
         });
 
         if (error || !data.user) {
-          throw new Error(error?.message || "로그인 정보를 확인해주세요.");
+          throw new Error(error?.message || '로그인 정보를 확인해주세요.');
         }
 
         // 인증 성공 시 반환할 객체
@@ -38,21 +38,16 @@ const handler = NextAuth({
           email: data.user.email,
           name: data.user.user_metadata?.full_name || data.user.email,
         };
-      }
+      },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async redirect({ url, baseUrl }) {
+      // ✅ /auth-success로 오는 건 무조건 허용
+      if (url.includes('/auth-success')) {
+        return url;
       }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id;
-      }
-      return session;
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
   },
   pages: {
