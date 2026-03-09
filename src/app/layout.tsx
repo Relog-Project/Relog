@@ -2,6 +2,7 @@ import { SupabaseHashCatcher } from '@/src/components/supabase-hash-catcher'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import React from "react"
+import { AuthProvider } from '@/src/components/providers/auth-provider'
 
 import './globals.css'
 
@@ -20,8 +21,10 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
-        <SupabaseHashCatcher />
-        {children}
+        <AuthProvider>
+          <SupabaseHashCatcher />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )
