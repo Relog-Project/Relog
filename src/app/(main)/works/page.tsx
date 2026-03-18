@@ -1,11 +1,26 @@
 import { DashboardHeader } from '@/src/components/layout/dashboard/dashboad-header';
 import WorksList from '@/src/features/works/components/works-list';
-import { createClient } from '@/src/utils/supabase/server';
 import { getWorks } from '@/src/features/works/services/get-works';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { redirect } from 'next/navigation';
 
 export default async function WorksPage() {
-  const supabase = await createClient();
-  const works = await getWorks(supabase);
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+
+  if (!userId) {
+    redirect('/login');
+  }
+
+  // 서버 사이드에서 RLS를 우회하기 위해 service_role 클라이언트 사용
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const works = await getWorks(supabaseAdmin, userId);
 
   return (
     <div>

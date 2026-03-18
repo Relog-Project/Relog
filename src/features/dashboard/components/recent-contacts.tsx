@@ -1,11 +1,23 @@
-import { createClient } from '@/src/utils/supabase/server';
 import { getContacts } from '@/src/features/contacts/services/get-contacts';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export default async function RecentContacts() {
-  const supabase = await createClient();
-  const contacts = await getContacts(supabase);
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
 
-  const recentContacts = [...(contacts || [])]
+  if (!userId) return null;
+
+  // 서버 사이드에서 RLS를 우회하기 위해 service_role 클라이언트 사용
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const contacts = await getContacts(supabaseAdmin, userId);
+
+  const recentContacts = (contacts || [])
     .sort(
       (a, b) =>
         new Date(b.created_at).getTime() -

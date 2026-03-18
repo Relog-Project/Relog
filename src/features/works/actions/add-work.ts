@@ -1,25 +1,32 @@
 'use server';
 
-import { createClient } from '@/src/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { addWork } from '../services/add-work';
 import { AddWorkInput } from '../query-builder/add-work.builder';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export async function addWorkAction(
   data: AddWorkInput,
 ): Promise<{ error?: string; success?: boolean; data?: any }> {
-  const supabase = await createClient();
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
 
-  // 현재 로그인한 사용자 ID 가져오기
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  if (!userId) {
     return { error: '인증이 필요합니다.' };
   }
 
+  // RLS를 우회하기 위해 service_role 키를 사용하는 관리자 클라이언트 생성
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   try {
-    const result = await addWork(supabase, {
+    const result = await addWork(supabaseAdmin, {
       ...data,
-      user_id: user.id, // 쿼리 빌더와 일치하도록 user_id 사용
+      user_id: userId,
     });
     
     revalidatePath('/dashboard');

@@ -1,11 +1,23 @@
-import { createClient } from '@/src/utils/supabase/server';
 import { getContacts } from '../services/get-contacts';
 import Link from 'next/link';
 import { Mail, Briefcase } from 'lucide-react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export default async function ContactList() {
-  const supabase = await createClient();
-  const contacts = await getContacts(supabase);
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+
+  if (!userId) return null;
+
+  // 서버 사이드에서 RLS를 우회하기 위해 service_role 클라이언트 사용
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const contacts = await getContacts(supabaseAdmin, userId);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -29,7 +41,7 @@ export default async function ContactList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {contacts?.length === 0 ? (
+            {!contacts || contacts.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-10 text-center text-sm text-muted-foreground">
                   등록된 연락처가 없습니다.
@@ -72,7 +84,7 @@ export default async function ContactList() {
 
       {/* Mobile Card View */}
       <div className="md:hidden divide-y divide-border">
-        {contacts?.length === 0 ? (
+        {!contacts || contacts.length === 0 ? (
           <div className="px-6 py-10 text-center text-sm text-muted-foreground">
             등록된 연락처가 없습니다.
           </div>

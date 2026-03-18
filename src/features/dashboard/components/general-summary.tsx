@@ -1,13 +1,25 @@
-import { createClient } from '@/src/utils/supabase/server';
 import { getContacts } from '@/src/features/contacts/services/get-contacts';
 import { getWorks } from '@/src/features/works/services/get-works';
 import { Briefcase, Clock, TrendingUp, Users } from 'lucide-react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export default async function GeneralSummary() {
-  const supabase = await createClient();
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as any)?.id;
+
+  if (!userId) return null;
+
+  // 서버 사이드에서 RLS를 우회하기 위해 service_role 클라이언트 사용
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   const [contacts, works] = await Promise.all([
-    getContacts(supabase),
-    getWorks(supabase),
+    getContacts(supabaseAdmin, userId),
+    getWorks(supabaseAdmin, userId),
   ]);
 
   const stats = [

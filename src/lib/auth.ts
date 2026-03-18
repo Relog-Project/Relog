@@ -104,8 +104,11 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.includes('/auth-success')) return url;
-      return url.startsWith(baseUrl) ? url : baseUrl;
+      // 상대 경로면 baseUrl을 붙여서 절대 경로로 만듦
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // 이미 같은 도메인이면 허용
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   pages: {

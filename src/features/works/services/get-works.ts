@@ -4,8 +4,8 @@ import {
   getWorksByContactIdQueryBuilder,
 } from '../query-builder/get-works.builder';
 
-export const getWorks = async (supabaseClient: SupabaseClient) => {
-  const { data: works, error } = await getWorksQueryBuilder(supabaseClient);
+export const getWorks = async (supabaseClient: SupabaseClient, userId: string) => {
+  const { data: works, error } = await getWorksQueryBuilder(supabaseClient, userId);
 
   if (error) {
     throw new Error(`작업 정보를 가져오는데 실패했습니다: ${error.message}`);
@@ -17,10 +17,12 @@ export const getWorks = async (supabaseClient: SupabaseClient) => {
 export const getWorksByContactId = async (
   supabaseClient: SupabaseClient,
   contactId: string,
+  userId: string,
 ) => {
   const { data: works, error } = await getWorksByContactIdQueryBuilder(
     supabaseClient,
     contactId,
+    userId,
   );
 
   if (error) {
