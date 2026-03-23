@@ -1,6 +1,8 @@
 'use server';
 
-import { createClient } from '@/src/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { updateWork } from '../services/update-work';
 
@@ -9,13 +11,15 @@ export async function updateWorkStatusAction(
   isCompleted: boolean,
   contactId?: string | number
 ): Promise<{ error?: string; success?: boolean }> {
-  const supabase = await createClient();
-
-  // 현재 로그인한 사용자 확인
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
     return { error: '인증이 필요합니다.' };
   }
+
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
 
   try {
     // 완료로 변경하면 오늘 날짜를, 진행 중으로 변경하면 null을 설정

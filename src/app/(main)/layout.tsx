@@ -11,10 +11,8 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
-  const {
-    data: { user },
-    error: authError,
-  } = await getCurrentUserAction();
+  const result = await getCurrentUserAction();
+  const user = result.data ?? null;
 
   // Supabase 세션도 없고 NextAuth 세션도 없으면 로그인 페이지로 이동
   if (!user && !session) {

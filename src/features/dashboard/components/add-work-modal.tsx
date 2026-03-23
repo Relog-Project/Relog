@@ -29,6 +29,7 @@ export function AddWorkModal({
 
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
+  const [isCompleted, setIsCompleted] = useState(false);
   const [endDate, setEndDate] = useState('');
   const [description, setDescription] = useState('');
 
@@ -40,7 +41,7 @@ export function AddWorkModal({
       const result = await addWorkAction({
         title,
         startDate: startDate,
-        endDate: endDate || null,
+        endDate: isCompleted ? (endDate || new Date().toISOString().split('T')[0]) : null,
         description,
         contactId: contactId,
       });
@@ -50,6 +51,7 @@ export function AddWorkModal({
       } else {
         setTitle('');
         setStartDate('');
+        setIsCompleted(false);
         setEndDate('');
         setDescription('');
         onClose();
@@ -82,17 +84,30 @@ export function AddWorkModal({
               required
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="start-date">시작일</Label>
-              <Input
-                id="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor="start-date">시작일</Label>
+            <Input
+              id="start-date"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+            <span className="text-sm font-medium">진행 상태</span>
+            <button
+              type="button"
+              onClick={() => setIsCompleted((prev) => !prev)}
+              className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors
+                data-[completed=true]:border-muted data-[completed=true]:bg-muted data-[completed=true]:text-muted-foreground
+                data-[completed=false]:border-primary/30 data-[completed=false]:bg-primary/10 data-[completed=false]:text-primary"
+              data-completed={isCompleted}
+            >
+              {isCompleted ? '완료' : '진행 중'}
+            </button>
+          </div>
+          {isCompleted && (
             <div className="grid gap-2">
               <Label htmlFor="end-date">종료일</Label>
               <Input
@@ -102,7 +117,7 @@ export function AddWorkModal({
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
-          </div>
+          )}
           <div className="grid gap-2">
             <Label htmlFor="work-description">설명</Label>
             <Textarea

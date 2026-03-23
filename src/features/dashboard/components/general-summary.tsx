@@ -1,6 +1,6 @@
 import { getContacts } from '@/src/features/contacts/services/get-contacts';
 import { getWorks } from '@/src/features/works/services/get-works';
-import { Briefcase, Clock, TrendingUp, Users } from 'lucide-react';
+import { Briefcase, CheckCircle2, TrendingUp, Users } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/src/lib/auth';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
@@ -11,7 +11,6 @@ export default async function GeneralSummary() {
 
   if (!userId) return null;
 
-  // 서버 사이드에서 RLS를 우회하기 위해 service_role 클라이언트 사용
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -22,59 +21,68 @@ export default async function GeneralSummary() {
     getWorks(supabaseAdmin, userId),
   ]);
 
+  const thisMonthContacts = (contacts || []).filter((c: any) => {
+    const d = new Date(c.created_at);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
   const stats = [
     {
       label: '전체 연락처',
-      value: contacts?.length?.toString() || '0',
+      value: contacts?.length ?? 0,
       icon: Users,
-      change: '총 누적',
+      sub: '총 누적',
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/10',
     },
     {
       label: '진행 중 작업',
-      value: works?.filter((w: any) => !w.endDate)?.length?.toString() || '0',
+      value: works?.filter((w: any) => !w.endDate)?.length ?? 0,
       icon: Briefcase,
-      change: '활성',
+      sub: '활성',
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
     },
     {
       label: '완료된 작업',
-      value: works?.filter((w: any) => w.endDate)?.length?.toString() || '0',
-      icon: Clock,
-      change: '총 누적',
+      value: works?.filter((w: any) => w.endDate)?.length ?? 0,
+      icon: CheckCircle2,
+      sub: '총 누적',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
     },
     {
-      label: '이번 달 신규 연락처',
-      value: contacts
-        ?.filter((c: any) => {
-          const createdAt = new Date(c.created_at);
-          const now = new Date();
-          return (
-            createdAt.getMonth() === now.getMonth() &&
-            createdAt.getFullYear() === now.getFullYear()
-          );
-        })
-        ?.length?.toString() || '0',
+      label: '이번 달 신규',
+      value: thisMonthContacts,
       icon: TrendingUp,
-      change: '최근 활동',
+      sub: '신규 연락처',
+      color: 'text-violet-500',
+      bg: 'bg-violet-500/10',
     },
   ];
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl border border-border bg-card p-6"
+          className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-shadow hover:shadow-sm"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">
-              {stat.label}
-            </span>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
+              <p className="mt-2 text-3xl font-bold tracking-tight text-card-foreground">
+                {stat.value}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{stat.sub}</p>
+            </div>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.bg}`}>
+              <stat.icon className={`h-5 w-5 ${stat.color}`} />
+            </div>
           </div>
-          <div className="mt-3 text-3xl font-semibold text-card-foreground">
-            {stat.value}
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">{stat.change}</p>
+          {/* 배경 데코 */}
+          <div className={`pointer-events-none absolute -right-4 -bottom-4 h-20 w-20 rounded-full ${stat.bg} opacity-40`} />
         </div>
       ))}
     </div>
