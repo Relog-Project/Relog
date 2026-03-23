@@ -5,7 +5,7 @@ import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
 import { updatePasswordAction } from '../actions/update.password';
 import { useState, useTransition } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export default function UpdatePasswordForm() {
   const router = useRouter();
