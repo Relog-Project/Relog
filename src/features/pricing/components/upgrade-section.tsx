@@ -1,11 +1,12 @@
 'use client';
 
-import { Check, Zap, Crown } from 'lucide-react';
-import { Button } from '@/src/components/ui/button';
+import { Check, Crown, Zap } from 'lucide-react';
+import { TossPaymentButton } from './toss-payment-button';
 
 interface UpgradeSectionProps {
   currentPlan: 'free' | 'pro';
   userEmail: string;
+  userName: string;
 }
 
 const proFeatures = [
@@ -24,7 +25,7 @@ const freeFeatures = [
   '진행 상태 관리',
 ];
 
-export function UpgradeSection({ currentPlan, userEmail }: UpgradeSectionProps) {
+export function UpgradeSection({ currentPlan, userEmail, userName }: UpgradeSectionProps) {
   const isPro = currentPlan === 'pro';
 
   return (
@@ -91,7 +92,7 @@ export function UpgradeSection({ currentPlan, userEmail }: UpgradeSectionProps) 
       {!isPro && (
         <div className="relative rounded-2xl border border-primary bg-primary/5 overflow-hidden">
           {/* 상단 하이라이트 바 */}
-          <div className="h-1 w-full bg-gradient-to-r from-primary via-violet-500 to-primary" />
+          <div className="h-1 w-full bg-linear-to-r from-primary via-violet-500 to-primary" />
 
           <div className="px-6 py-5">
             <div className="flex items-start justify-between gap-4">
@@ -135,10 +136,7 @@ export function UpgradeSection({ currentPlan, userEmail }: UpgradeSectionProps) 
             </ul>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button size="lg" className="h-11 rounded-xl px-8 font-semibold shadow-md shadow-primary/20 sm:w-auto w-full">
-                <Zap className="mr-1.5 h-4 w-4" />
-                프로로 업그레이드
-              </Button>
+              <TossPaymentButton userEmail={userEmail} userName={userName} />
               <p className="text-xs text-muted-foreground">
                 언제든 취소 가능 · 7일 환불 보장
               </p>
