@@ -14,7 +14,7 @@ export default async function UpgradePage() {
     <div>
       <DashboardHeader title="요금제" description="현재 플랜을 확인하고 업그레이드하세요." />
       <div className="p-4 md:p-8">
-        <UpgradeSection currentPlan="free" userEmail={user.email} userName={user.name ?? ''} />
+        <UpgradeSection currentPlan={(user.plan === 'pro' ? 'pro' : 'free')} userEmail={user.email} userName={user.name ?? ''} />
       </div>
     </div>
   );
