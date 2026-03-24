@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/src/lib/utils";
-import { Briefcase, LayoutDashboard, Settings, Users } from "lucide-react";
+import { Briefcase, LayoutDashboard, Settings, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,6 +10,10 @@ const navItems = [
   { href: "/contacts", label: "Contacts", icon: Users },
   { href: "/works", label: "Works", icon: Briefcase },
   { href: "/settings", label: "Settings", icon: Settings },
+];
+
+const bottomNavItems = [
+  { href: "/upgrade", label: "요금제", icon: Zap },
 ];
 
 interface AppSidebarProps {
@@ -63,8 +67,29 @@ export function AppSidebar({ user }: AppSidebarProps) {
           })}
         </ul>
       </nav>
-      <div className="border-t border-sidebar-border px-4 py-4">
-        <div className="flex items-center gap-3">
+      <div className="border-t border-sidebar-border px-3 py-3">
+        <ul className="flex flex-col gap-1 mb-3">
+          {bottomNavItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="border-t border-sidebar-border pt-3 flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
             {initial}
           </div>

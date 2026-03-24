@@ -13,6 +13,9 @@ export function LandingNav() {
         </Link>
         <nav className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <Link href="/pricing">요금제</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
             <Link href="/login">로그인</Link>
           </Button>
           <Button asChild size="sm" className="rounded-full px-5">

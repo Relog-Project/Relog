@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/src/lib/utils";
-import { Briefcase, LayoutDashboard, Menu, Settings, Users, X } from "lucide-react";
+import { Briefcase, LayoutDashboard, Menu, Settings, Users, X, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog";
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/contacts", label: "Contacts", icon: Users },
   { href: "/works", label: "Works", icon: Briefcase },
   { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/upgrade", label: "요금제", icon: Zap },
 ];
 
 interface MobileNavProps {
