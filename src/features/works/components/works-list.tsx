@@ -47,6 +47,22 @@ export default function WorksList({ initialWorks }: WorksListProps) {
 
   const hasFilter = searchQuery || statusFilter !== 'all' || startDateFrom || startDateTo;
 
+  const groupedWorks = useMemo(() => {
+    const map = new Map<string, { contactId: string | null; contactName: string; works: any[] }>();
+    for (const work of filteredWorks) {
+      const key = work.contacts?.id ?? '__none__';
+      if (!map.has(key)) {
+        map.set(key, {
+          contactId: work.contacts?.id ?? null,
+          contactName: work.contacts?.name ?? '연락처 없음',
+          works: [],
+        });
+      }
+      map.get(key)!.works.push(work);
+    }
+    return Array.from(map.values());
+  }, [filteredWorks]);
+
   const clearFilters = () => {
     setSearchQuery('');
     setStatusFilter('all');
@@ -128,130 +144,87 @@ export default function WorksList({ initialWorks }: WorksListProps) {
       </div>
 
       {/* 리스트 */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border text-left">
-                <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  작업명
-                </th>
-                <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  연락처
-                </th>
-                <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  시작일
-                </th>
-                <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  종료일
-                </th>
-                <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  상태
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredWorks.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-sm text-muted-foreground">
-                    {hasFilter ? '검색 결과가 없습니다.' : '기록된 작업이 없습니다.'}
-                  </td>
-                </tr>
-              ) : (
-                filteredWorks.map((work: any) => {
-                  const contact = work.contacts;
-                  return (
-                    <tr
-                      key={work.id}
-                      className="group transition-colors hover:bg-muted/50 cursor-pointer"
-                      onClick={() => handleWorkClick(work)}
-                    >
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                          {work.title}
-                        </span>
-                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
-                          {work.description}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                        {contact && (
-                          <Link
-                            href={`/contacts/${contact.id}`}
-                            className="text-sm font-medium text-foreground hover:underline"
-                          >
-                            {contact.name}
-                          </Link>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {new Date(work.startDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {work.endDate ? new Date(work.endDate).toLocaleDateString() : '-'}
-                      </td>
-                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                        <WorkStatusToggle
-                          workId={work.id}
-                          isCompleted={!!work.endDate}
-                          contactId={work.contacts?.id}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+      {filteredWorks.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card px-6 py-10 text-center text-sm text-muted-foreground">
+          {hasFilter ? '검색 결과가 없습니다.' : '기록된 작업이 없습니다.'}
         </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {groupedWorks.map((group) => (
+            <div key={group.contactId ?? '__none__'} className="rounded-xl border border-border bg-card overflow-hidden">
+              {/* 연락처 헤더 */}
+              <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-3 md:px-6">
+                <User className="h-4 w-4 text-muted-foreground" />
+                {group.contactId ? (
+                  <Link
+                    href={`/contacts/${group.contactId}`}
+                    className="text-sm font-semibold text-foreground hover:underline"
+                  >
+                    {group.contactName}
+                  </Link>
+                ) : (
+                  <span className="text-sm font-semibold text-muted-foreground">{group.contactName}</span>
+                )}
+                <span className="ml-auto text-xs text-muted-foreground">{group.works.length}건</span>
+              </div>
 
-        {/* Mobile Card View */}
-        <div className="md:hidden divide-y divide-border">
-          {filteredWorks.length === 0 ? (
-            <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-              {hasFilter ? '검색 결과가 없습니다.' : '기록된 작업이 없습니다.'}
-            </div>
-          ) : (
-            filteredWorks.map((work: any) => {
-              const contact = work.contacts;
-              return (
-                <div
-                  key={work.id}
-                  className="p-4 active:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={() => handleWorkClick(work)}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-foreground truncate">
-                        {work.title}
-                      </h3>
-                      <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                        {work.description}
-                      </p>
-                    </div>
-                    <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <WorkStatusToggle
-                        workId={work.id}
-                        isCompleted={!!work.endDate}
-                        contactId={work.contacts?.id}
-                      />
-                    </div>
-                  </div>
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">작업명</th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">시작일</th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">종료일</th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">상태</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {group.works.map((work: any) => (
+                      <tr
+                        key={work.id}
+                        className="group transition-colors hover:bg-muted/50 cursor-pointer"
+                        onClick={() => handleWorkClick(work)}
+                      >
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                            {work.title}
+                          </span>
+                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{work.description}</p>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
+                          {new Date(work.startDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
+                          {work.endDate ? new Date(work.endDate).toLocaleDateString() : '-'}
+                        </td>
+                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                          <WorkStatusToggle workId={work.id} isCompleted={!!work.endDate} contactId={group.contactId ?? undefined} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    {contact && (
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground" onClick={(e) => e.stopPropagation()}>
-                        <User className="h-3.5 w-3.5" />
-                        <Link
-                          href={`/contacts/${contact.id}`}
-                          className="font-medium text-foreground hover:underline"
-                        >
-                          {contact.name}
-                        </Link>
+              {/* Mobile Card */}
+              <div className="md:hidden divide-y divide-border">
+                {group.works.map((work: any) => (
+                  <div
+                    key={work.id}
+                    className="p-4 active:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => handleWorkClick(work)}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-foreground truncate">{work.title}</h3>
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{work.description}</p>
                       </div>
-                    )}
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                        <WorkStatusToggle workId={work.id} isCompleted={!!work.endDate} contactId={group.contactId ?? undefined} />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Calendar className="h-3.5 w-3.5" />
                       <span>
                         {new Date(work.startDate).toLocaleDateString()}
@@ -259,12 +232,12 @@ export default function WorksList({ initialWorks }: WorksListProps) {
                       </span>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
 
       <WorkDetailModal
         work={selectedWork}

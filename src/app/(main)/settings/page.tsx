@@ -5,7 +5,8 @@ import { Label } from '@/src/components/ui/label';
 import { Button } from '@/src/components/ui/button';
 import { LogoutButton } from '../../../features/settings/components/logout-button';
 import { redirect } from 'next/navigation';
-import { User, Mail, Building2, Shield } from 'lucide-react';
+import { User, Mail, Building2, Shield, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function SettingsPage() {
   const { data: dbUserData, error } = await getCurrentUserAction();
@@ -94,6 +95,31 @@ export default async function SettingsPage() {
               <div className="flex justify-end">
                 <Button size="sm" className="px-5">저장</Button>
               </div>
+            </div>
+          </div>
+
+          {/* 요금제 - 모바일 전용 */}
+          <div className="rounded-2xl border border-border bg-card md:hidden">
+            <div className="flex items-center gap-3 border-b border-border px-6 py-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Zap size={16} />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-card-foreground">요금제</h2>
+                <p className="text-xs text-muted-foreground">현재 플랜을 확인하고 업그레이드하세요.</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <Link
+                href="/upgrade"
+                className="flex items-center justify-between rounded-xl border border-border bg-muted/30 px-4 py-3 transition-colors hover:bg-muted"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">플랜 관리</p>
+                  <p className="text-xs text-muted-foreground">요금제 확인 및 업그레이드</p>
+                </div>
+                <Zap size={16} className="text-primary" />
+              </Link>
             </div>
           </div>
 
