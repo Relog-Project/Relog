@@ -1,6 +1,6 @@
 'use client';
 
-import { loadTossPayments, ANONYMOUS } from '@tosspayments/tosspayments-sdk';
+import { loadTossPayments } from '@tosspayments/tosspayments-sdk';
 import { useState } from 'react';
 import { Button } from '@/src/components/ui/button';
 import { Zap } from 'lucide-react';
@@ -18,6 +18,11 @@ function generateOrderId() {
   return `relog-pro-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// 이메일을 토스 customerKey 규칙(영문/숫자/_-=.@ 2~50자)에 맞게 변환
+function toCustomerKey(email: string) {
+  return email.replace(/[^a-zA-Z0-9_\-=.@]/g, '_').slice(0, 50);
+}
+
 export function TossPaymentButton({ userEmail, userName }: TossPaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +30,7 @@ export function TossPaymentButton({ userEmail, userName }: TossPaymentButtonProp
     setIsLoading(true);
     try {
       const tossPayments = await loadTossPayments(CLIENT_KEY);
-      const payment = tossPayments.payment({ customerKey: ANONYMOUS });
+      const payment = tossPayments.payment({ customerKey: toCustomerKey(userEmail) });
 
       await payment.requestPayment({
         method: 'CARD',
