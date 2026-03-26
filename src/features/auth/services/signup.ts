@@ -18,7 +18,10 @@ export const signup = async (
     if (error.status === 429) {
       throw new Error('EMAIL_RATE_LIMIT');
     }
-    throw new Error(`회원가입에 실패했습니다: ${error.message}`);
+    if (error.message === 'User already registered') {
+      throw new Error('이미 가입된 이메일입니다. 로그인을 이용해주세요.');
+    }
+    throw new Error('회원가입에 실패했습니다. 다시 시도해주세요.');
   }
 
   return data;

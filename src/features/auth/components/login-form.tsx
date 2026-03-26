@@ -6,10 +6,17 @@ import { Label } from '@/src/components/ui/label';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginForm() {
-  const [message, setMessage] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const initialMessage =
+    errorParam === 'EmailAlreadyRegistered'
+      ? '이미 이메일/비밀번호로 가입된 계정입니다. 이메일 로그인을 이용해주세요.'
+      : null;
+
+  const [message, setMessage] = useState<string | null>(initialMessage);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 

@@ -72,14 +72,19 @@ export const authOptions: NextAuthOptions = {
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
-        
-        console.log('SignIn Callback - Syncing Google user:', user.email);
 
         const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
         let targetUser = users.find(u => u.email === user.email);
 
-        if (!targetUser) {
-          console.log('SignIn Callback - Creating user in Supabase Auth...');
+        if (targetUser) {
+          // 이메일/비밀번호로만 가입된 계정이면 소셜 로그인 차단
+          const identities = targetUser.identities ?? [];
+          const hasOnlyEmailIdentity =
+            identities.length > 0 && identities.every(i => i.provider === 'email');
+          if (hasOnlyEmailIdentity) {
+            return '/login?error=EmailAlreadyRegistered';
+          }
+        } else {
           const { data: { user: newUser }, error: createError } = await supabaseAdmin.auth.admin.createUser({
             email: user.email!,
             email_confirm: true,
@@ -109,7 +114,6 @@ export const authOptions: NextAuthOptions = {
           });
         }
 
-        // 여기에 ID를 저장해두면 jwt 콜백의 user 객체로 전달됩니다.
         user.id = targetUser.id;
       }
       return true;
