@@ -157,6 +157,19 @@ export default function LoginForm() {
             </svg>
             Apple로 로그인
           </Button> */}
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => handleSocialLogin('naver')}
+            disabled={isPending}
+          >
+            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="#03C75A">
+              <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z" />
+            </svg>
+            네이버로 로그인
+          </Button>
         </form>
       </div>
       <p className="mt-6 text-center text-sm text-muted-foreground">

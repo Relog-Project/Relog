@@ -16,6 +16,27 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.APPLE_ID || '',
       clientSecret: process.env.APPLE_SECRET || '',
     }),
+    {
+      id: 'naver',
+      name: 'Naver',
+      type: 'oauth',
+      authorization: {
+        url: 'https://nid.naver.com/oauth2.0/authorize',
+        params: { scope: '' },
+      },
+      token: 'https://nid.naver.com/oauth2.0/token',
+      userinfo: 'https://openapi.naver.com/v1/nid/me',
+      profile(profile: any) {
+        return {
+          id: profile.response.id,
+          name: profile.response.name,
+          email: profile.response.email,
+          image: profile.response.profile_image,
+        };
+      },
+      clientId: process.env.NAVER_CLIENT_ID,
+      clientSecret: process.env.NAVER_CLIENT_SECRET,
+    } as any,
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -45,7 +66,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google' || account?.provider === 'apple') {
+      if (account?.provider === 'google' || account?.provider === 'apple' || account?.provider === 'naver') {
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const supabaseAdmin = createSupabaseClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
