@@ -1,6 +1,7 @@
 // src/lib/auth.ts
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import AppleProvider from 'next-auth/providers/apple';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { createClient } from '@/src/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
@@ -10,6 +11,10 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
+    AppleProvider({
+      clientId: process.env.APPLE_ID || '',
+      clientSecret: process.env.APPLE_SECRET || '',
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -40,7 +45,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
+      if (account?.provider === 'google' || account?.provider === 'apple') {
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const supabaseAdmin = createSupabaseClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
