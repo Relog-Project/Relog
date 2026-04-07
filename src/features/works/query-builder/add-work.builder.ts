@@ -6,6 +6,7 @@ export interface AddWorkInput {
   description?: string;
   startDate: string;
   endDate?: string | null;
+  amount?: number | null;
 }
 
 export interface AddWorkData extends AddWorkInput {

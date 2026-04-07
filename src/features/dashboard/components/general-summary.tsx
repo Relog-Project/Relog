@@ -1,6 +1,6 @@
 import { getContacts } from '@/src/features/contacts/services/get-contacts';
 import { getWorks } from '@/src/features/works/services/get-works';
-import { Briefcase, CheckCircle2, TrendingUp, Users } from 'lucide-react';
+import { Briefcase, CheckCircle2, TrendingUp, Users, WalletCards, CircleDollarSign } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/src/lib/auth';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
@@ -27,6 +27,13 @@ export default async function GeneralSummary() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
 
+  const worksWithAmount = (works || []).filter((w: any) => w.amount != null);
+  const unpaidAmount = worksWithAmount.filter((w: any) => !w.is_paid).reduce((sum: number, w: any) => sum + (w.amount ?? 0), 0);
+  const paidAmount = worksWithAmount.filter((w: any) => w.is_paid).reduce((sum: number, w: any) => sum + (w.amount ?? 0), 0);
+
+  const formatAmount = (n: number) =>
+    n >= 10000 ? `${(n / 10000).toFixed(n % 10000 === 0 ? 0 : 1)}만원` : `${n.toLocaleString()}원`;
+
   const stats = [
     {
       label: '전체 연락처',
@@ -35,6 +42,7 @@ export default async function GeneralSummary() {
       sub: '총 누적',
       color: 'text-blue-500',
       bg: 'bg-blue-500/10',
+      isAmount: false,
     },
     {
       label: '진행 중 작업',
@@ -43,22 +51,25 @@ export default async function GeneralSummary() {
       sub: '활성',
       color: 'text-amber-500',
       bg: 'bg-amber-500/10',
+      isAmount: false,
     },
     {
-      label: '완료된 작업',
-      value: works?.filter((w: any) => w.endDate)?.length ?? 0,
-      icon: CheckCircle2,
-      sub: '총 누적',
+      label: '미수금',
+      value: unpaidAmount,
+      icon: WalletCards,
+      sub: `${worksWithAmount.filter((w: any) => !w.is_paid).length}건`,
+      color: 'text-rose-500',
+      bg: 'bg-rose-500/10',
+      isAmount: true,
+    },
+    {
+      label: '수금 완료',
+      value: paidAmount,
+      icon: CircleDollarSign,
+      sub: `${worksWithAmount.filter((w: any) => w.is_paid).length}건`,
       color: 'text-emerald-500',
       bg: 'bg-emerald-500/10',
-    },
-    {
-      label: '이번 달 신규',
-      value: thisMonthContacts,
-      icon: TrendingUp,
-      sub: '신규 연락처',
-      color: 'text-violet-500',
-      bg: 'bg-violet-500/10',
+      isAmount: true,
     },
   ];
 
@@ -73,7 +84,7 @@ export default async function GeneralSummary() {
             <div>
               <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
               <p className="mt-2 text-3xl font-bold tracking-tight text-card-foreground">
-                {stat.value}
+                {stat.isAmount ? formatAmount(stat.value as number) : stat.value}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{stat.sub}</p>
             </div>

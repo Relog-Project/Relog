@@ -32,6 +32,7 @@ export function AddWorkModal({
   const [isCompleted, setIsCompleted] = useState(false);
   const [endDate, setEndDate] = useState('');
   const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,10 +41,11 @@ export function AddWorkModal({
     startTransition(async () => {
       const result = await addWorkAction({
         title,
-        startDate: startDate,
+        startDate,
         endDate: isCompleted ? (endDate || new Date().toISOString().split('T')[0]) : null,
         description,
-        contactId: contactId,
+        contactId,
+        amount: amount ? Number(amount) : null,
       });
 
       if (result.error) {
@@ -54,6 +56,7 @@ export function AddWorkModal({
         setIsCompleted(false);
         setEndDate('');
         setDescription('');
+        setAmount('');
         onClose();
       }
     });
@@ -118,6 +121,17 @@ export function AddWorkModal({
               />
             </div>
           )}
+          <div className="grid gap-2">
+            <Label htmlFor="work-amount">금액 (원)</Label>
+            <Input
+              id="work-amount"
+              type="number"
+              placeholder="예: 1500000"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              min={0}
+            />
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="work-description">설명</Label>
             <Textarea

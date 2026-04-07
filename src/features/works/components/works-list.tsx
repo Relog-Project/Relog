@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { IWork } from '@/src/types/works';
 import { WorkDetailModal } from './work-detail-modal';
 import { WorkStatusToggle } from './work-status-toggle';
 import { Calendar, User, Search, X } from 'lucide-react';
 import { Input } from '@/src/components/ui/input';
+import { SettlementToggle } from './settlement-toggle';
 
 interface WorksListProps {
   initialWorks: any[];
@@ -15,6 +16,7 @@ interface WorksListProps {
 type StatusFilter = 'all' | 'active' | 'completed';
 
 export default function WorksList({ initialWorks }: WorksListProps) {
+  const [works, setWorks] = useState<any[]>(initialWorks);
   const [selectedWork, setSelectedWork] = useState<IWork | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -23,8 +25,31 @@ export default function WorksList({ initialWorks }: WorksListProps) {
   const [startDateFrom, setStartDateFrom] = useState('');
   const [startDateTo, setStartDateTo] = useState('');
 
+  useEffect(() => {
+    setWorks(initialWorks);
+  }, [initialWorks]);
+
+  const handleStatusChange = (
+    workId: string | number,
+    isCompleted: boolean,
+  ) => {
+    const today = new Date().toISOString().split('T')[0];
+    setWorks((prev) =>
+      prev.map((w) =>
+        String(w.id) === String(workId)
+          ? { ...w, endDate: isCompleted ? today : null }
+          : w,
+      ),
+    );
+    setSelectedWork((prev) =>
+      prev && String(prev.id) === String(workId)
+        ? { ...prev, endDate: isCompleted ? today : null }
+        : prev,
+    );
+  };
+
   const filteredWorks = useMemo(() => {
-    return initialWorks.filter((work) => {
+    return works.filter((work) => {
       // 작업명 / 연락처명 텍스트 검색
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -45,10 +70,14 @@ export default function WorksList({ initialWorks }: WorksListProps) {
     });
   }, [initialWorks, searchQuery, statusFilter, startDateFrom, startDateTo]);
 
-  const hasFilter = searchQuery || statusFilter !== 'all' || startDateFrom || startDateTo;
+  const hasFilter =
+    searchQuery || statusFilter !== 'all' || startDateFrom || startDateTo;
 
   const groupedWorks = useMemo(() => {
-    const map = new Map<string, { contactId: string | null; contactName: string; works: any[] }>();
+    const map = new Map<
+      string,
+      { contactId: string | null; contactName: string; works: any[] }
+    >();
     for (const work of filteredWorks) {
       const key = work.contacts?.id ?? '__none__';
       if (!map.has(key)) {
@@ -151,7 +180,10 @@ export default function WorksList({ initialWorks }: WorksListProps) {
       ) : (
         <div className="flex flex-col gap-4">
           {groupedWorks.map((group) => (
-            <div key={group.contactId ?? '__none__'} className="rounded-xl border border-border bg-card overflow-hidden">
+            <div
+              key={group.contactId ?? '__none__'}
+              className="rounded-xl border border-border bg-card overflow-hidden"
+            >
               {/* 연락처 헤더 */}
               <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-3 md:px-6">
                 <User className="h-4 w-4 text-muted-foreground" />
@@ -163,9 +195,13 @@ export default function WorksList({ initialWorks }: WorksListProps) {
                     {group.contactName}
                   </Link>
                 ) : (
-                  <span className="text-sm font-semibold text-muted-foreground">{group.contactName}</span>
+                  <span className="text-sm font-semibold text-muted-foreground">
+                    {group.contactName}
+                  </span>
                 )}
-                <span className="ml-auto text-xs text-muted-foreground">{group.works.length}건</span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {group.works.length}건
+                </span>
               </div>
 
               {/* Desktop Table */}
@@ -173,10 +209,24 @@ export default function WorksList({ initialWorks }: WorksListProps) {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border text-left">
-                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">작업명</th>
-                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">시작일</th>
-                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">종료일</th>
-                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">상태</th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        작업명
+                      </th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        시작일
+                      </th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        종료일
+                      </th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        금액
+                      </th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        수금
+                      </th>
+                      <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        상태
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -190,16 +240,49 @@ export default function WorksList({ initialWorks }: WorksListProps) {
                           <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                             {work.title}
                           </span>
-                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{work.description}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+                            {work.description}
+                          </p>
                         </td>
                         <td className="px-6 py-4 text-sm text-muted-foreground">
-                          {new Date(work.startDate).toLocaleDateString()}
+                          {new Date(work.startDate).toLocaleDateString('ko-KR')}
                         </td>
                         <td className="px-6 py-4 text-sm text-muted-foreground">
-                          {work.endDate ? new Date(work.endDate).toLocaleDateString() : '-'}
+                          {work.endDate
+                            ? new Date(work.endDate).toLocaleDateString('ko-KR')
+                            : '-'}
                         </td>
-                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                          <WorkStatusToggle workId={work.id} isCompleted={!!work.endDate} contactId={group.contactId ?? undefined} />
+                        <td className="px-6 py-4 text-sm font-medium">
+                          {work.amount != null
+                            ? `${work.amount.toLocaleString()}원`
+                            : '-'}
+                        </td>
+                        <td
+                          className="px-6 py-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {work.amount != null ? (
+                            <SettlementToggle
+                              workId={work.id}
+                              isPaid={work.is_paid}
+                              contactId={group.contactId ?? undefined}
+                            />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">
+                              -
+                            </span>
+                          )}
+                        </td>
+                        <td
+                          className="px-6 py-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <WorkStatusToggle
+                            workId={work.id}
+                            isCompleted={!!work.endDate}
+                            contactId={group.contactId ?? undefined}
+                            onStatusChange={handleStatusChange}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -217,19 +300,48 @@ export default function WorksList({ initialWorks }: WorksListProps) {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-foreground truncate">{work.title}</h3>
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{work.description}</p>
+                        <h3 className="text-sm font-semibold text-foreground truncate">
+                          {work.title}
+                        </h3>
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                          {work.description}
+                        </p>
                       </div>
-                      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-                        <WorkStatusToggle workId={work.id} isCompleted={!!work.endDate} contactId={group.contactId ?? undefined} />
+                      <div
+                        className="shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <WorkStatusToggle
+                          workId={work.id}
+                          isCompleted={!!work.endDate}
+                          contactId={group.contactId ?? undefined}
+                        />
                       </div>
                     </div>
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Calendar className="h-3.5 w-3.5" />
-                      <span>
-                        {new Date(work.startDate).toLocaleDateString()}
-                        {work.endDate && ` - ${new Date(work.endDate).toLocaleDateString()}`}
-                      </span>
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>
+                          {new Date(work.startDate).toLocaleDateString('ko-KR')}
+                          {work.endDate &&
+                            ` - ${new Date(work.endDate).toLocaleDateString('ko-KR')}`}
+                        </span>
+                      </div>
+                      {work.amount != null && (
+                        <div
+                          className="flex items-center gap-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="text-xs font-medium">
+                            {work.amount.toLocaleString()}원
+                          </span>
+                          <SettlementToggle
+                            workId={work.id}
+                            isPaid={work.is_paid}
+                            contactId={group.contactId ?? undefined}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -243,6 +355,7 @@ export default function WorksList({ initialWorks }: WorksListProps) {
         work={selectedWork}
         open={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

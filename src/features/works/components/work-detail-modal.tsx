@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -7,19 +7,26 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/src/components/ui/dialog";
-import { Button } from "@/src/components/ui/button";
-import { IWork } from "@/src/types/works";
-import { Calendar, FileText, Info } from "lucide-react";
-import { WorkStatusToggle } from "./work-status-toggle";
+} from '@/src/components/ui/dialog';
+import { Button } from '@/src/components/ui/button';
+import { IWork } from '@/src/types/works';
+import { Calendar, FileText, Info, WalletCards } from 'lucide-react';
+import { WorkStatusToggle } from './work-status-toggle';
+import { SettlementToggle } from './settlement-toggle';
 
 interface WorkDetailModalProps {
   work: IWork | null;
   open: boolean;
   onClose: () => void;
+  onStatusChange?: (workId: string | number, isCompleted: boolean) => void;
 }
 
-export function WorkDetailModal({ work, open, onClose }: WorkDetailModalProps) {
+export function WorkDetailModal({
+  work,
+  open,
+  onClose,
+  onStatusChange,
+}: WorkDetailModalProps) {
   if (!work) return null;
 
   return (
@@ -48,7 +55,26 @@ export function WorkDetailModal({ work, open, onClose }: WorkDetailModalProps) {
               workId={work.id}
               isCompleted={!!work.endDate}
               contactId={work.contactId}
-              onSuccess={onClose}
+              // onSuccess={onClose}
+              onStatusChange={onStatusChange}
+            />
+          </div>
+
+          {/* 정산 정보 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <WalletCards size={16} className="text-muted-foreground" />
+              <span className="text-sm font-semibold">
+                {work.amount != null
+                  ? `${work.amount.toLocaleString()}원`
+                  : '금액 미등록'}
+              </span>
+            </div>
+            <SettlementToggle
+              workId={work.id}
+              isPaid={work.is_paid}
+              contactId={work.contactId}
+              // onSuccess={onClose}
             />
           </div>
 
@@ -60,7 +86,7 @@ export function WorkDetailModal({ work, open, onClose }: WorkDetailModalProps) {
             <div className="grid gap-1">
               <span className="text-sm font-semibold">진행 기간</span>
               <p className="text-sm text-muted-foreground">
-                {work.startDate} ~ {work.endDate || "진행 중"}
+                {work.startDate} ~ {work.endDate || '진행 중'}
               </p>
             </div>
           </div>
@@ -74,7 +100,7 @@ export function WorkDetailModal({ work, open, onClose }: WorkDetailModalProps) {
               <span className="text-sm font-semibold">작업 상세 설명</span>
               <div className="rounded-lg bg-muted/50 p-4">
                 <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                  {work.description || "등록된 설명이 없습니다."}
+                  {work.description || '등록된 설명이 없습니다.'}
                 </p>
               </div>
             </div>

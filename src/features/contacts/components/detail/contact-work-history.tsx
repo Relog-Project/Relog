@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IWork } from '@/src/types/works';
 import { WorkDetailModal } from '@/src/features/works/components/work-detail-modal';
 
@@ -11,8 +11,29 @@ interface IContactWorkHistoryProps {
 export default function ContactWorkHistory({
   contactWorks,
 }: IContactWorkHistoryProps) {
+  const [works, setWorks] = useState<IWork[]>(contactWorks);
   const [selectedWork, setSelectedWork] = useState<IWork | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  useEffect(() => {
+    setWorks(contactWorks);
+  }, [contactWorks]);
+
+  const handleStatusChange = (workId: string | number, isCompleted: boolean) => {
+    const today = new Date().toISOString().split('T')[0];
+    setWorks(prev =>
+      prev.map(w =>
+        String(w.id) === String(workId)
+          ? { ...w, endDate: isCompleted ? today : null }
+          : w,
+      ),
+    );
+    setSelectedWork(prev =>
+      prev && String(prev.id) === String(workId)
+        ? { ...prev, endDate: isCompleted ? today : null }
+        : prev,
+    );
+  };
 
   const handleWorkClick = (work: IWork) => {
     setSelectedWork(work);
@@ -27,13 +48,13 @@ export default function ContactWorkHistory({
             작업 이력
           </h2>
         </div>
-        {contactWorks.length === 0 ? (
+        {works.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-muted-foreground">
             아직 기록된 작업이 없습니다.
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {contactWorks
+            {[...works]
               .sort(
                 (a, b) =>
                   new Date(b.startDate).getTime() -
@@ -74,10 +95,11 @@ export default function ContactWorkHistory({
         )}
       </div>
 
-      <WorkDetailModal 
+      <WorkDetailModal
         work={selectedWork}
         open={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { updateWorkStatusAction } from "../actions/update-work";
@@ -10,6 +10,7 @@ interface WorkStatusToggleProps {
   isCompleted: boolean;
   contactId?: string | number;
   onSuccess?: () => void;
+  onStatusChange?: (workId: string | number, isCompleted: boolean) => void;
 }
 
 export function WorkStatusToggle({
@@ -17,11 +18,16 @@ export function WorkStatusToggle({
   isCompleted,
   contactId,
   onSuccess,
+  onStatusChange,
 }: WorkStatusToggleProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [optimisticCompleted, setOptimisticCompleted] = useState(isCompleted);
+
+  useEffect(() => {
+    if (!isPending) setOptimisticCompleted(isCompleted);
+  }, [isCompleted]);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -35,6 +41,7 @@ export function WorkStatusToggle({
         setOptimisticCompleted(!next);
         setError(result.error);
       } else {
+        onStatusChange?.(workId, next);
         router.refresh();
         onSuccess?.();
       }

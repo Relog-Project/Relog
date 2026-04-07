@@ -1,4 +1,4 @@
-import { createClient } from '@/src/utils/supabase/server';
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { getContactById } from '@/src/features/contacts/services/get-contacts';
 import { getWorksByContactId } from '@/src/features/works/services/get-works';
 import ContactDetailClient from '@/src/features/contacts/components/detail/contact-detail-client';
@@ -10,8 +10,10 @@ export default async function ContactDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  console.log('Fetching detail for contact ID:', id);
-  const supabase = await createClient();
+  const supabase = createSupabaseAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
   const result = await getCurrentUserAction();
   const userId = result.data?.id;
 
@@ -28,7 +30,6 @@ export default async function ContactDetailPage({
     getWorksByContactId(supabase, id, userId),
   ]);
 
-  console.log('Fetched works for this contact:', contactWorks?.length || 0);
 
   if (!contact) {
     return (
