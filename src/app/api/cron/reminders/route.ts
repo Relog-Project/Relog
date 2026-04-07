@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         data: { contactId: reminder.contact_id },
       }));
 
-      await fetch('https://exp.host/--/api/v2/push/send', {
+      const expoRes = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify(messages),
       });
+      const expoData = await expoRes.json();
+      console.log('[cron/reminders] Expo response:', JSON.stringify(expoData));
     }
 
     // 발송 완료 표시
