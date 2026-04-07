@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +34,11 @@ export function AddReminderModal({
   const [title, setTitle] = useState('');
   const [remindDate, setRemindDate] = useState('');
   const [remindTime, setRemindTime] = useState('09:00');
+  const [today, setToday] = useState('');
+
+  useEffect(() => {
+    setToday(new Date().toISOString().split('T')[0]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +98,7 @@ export function AddReminderModal({
                 type="date"
                 value={remindDate}
                 onChange={(e) => setRemindDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+                min={today}
                 required
               />
             </div>

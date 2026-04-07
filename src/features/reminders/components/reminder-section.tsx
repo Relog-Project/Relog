@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { Bell, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { AddReminderModal } from './add-reminder-modal';
@@ -19,6 +19,15 @@ interface ReminderSectionProps {
   initialReminders: Reminder[];
 }
 
+function formatRemindAt(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const h = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  return `${y}년 ${m}월 ${d}일 ${h}:${min}`;
+}
+
 export function ReminderSection({
   contactId,
   contactName,
@@ -27,6 +36,11 @@ export function ReminderSection({
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
 
   const handleCreated = (reminder: Reminder) => {
     setReminders((prev) => [...prev, reminder].sort(
@@ -42,8 +56,6 @@ export function ReminderSection({
       }
     });
   };
-
-  const now = new Date();
 
   return (
     <div className="rounded-xl border border-border bg-card">
@@ -71,7 +83,7 @@ export function ReminderSection({
         <ul className="divide-y divide-border">
           {reminders.map((reminder) => {
             const remindDate = new Date(reminder.remind_at);
-            const isPast = remindDate < now;
+            const isPast = now !== null && remindDate < now;
             return (
               <li key={reminder.id} className="flex items-start justify-between gap-4 px-6 py-4">
                 <div className="flex items-start gap-3 min-w-0">
@@ -87,10 +99,7 @@ export function ReminderSection({
                       {reminder.title}
                     </p>
                     <p className={`mt-0.5 text-xs ${isPast && !reminder.is_sent ? 'text-rose-500 font-medium' : 'text-muted-foreground'}`}>
-                      {remindDate.toLocaleDateString('ko-KR', {
-                        year: 'numeric', month: 'long', day: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
-                      })}
+                      {formatRemindAt(remindDate)}
                       {isPast && !reminder.is_sent && ' · 지남'}
                       {reminder.is_sent && ' · 발송됨'}
                     </p>
