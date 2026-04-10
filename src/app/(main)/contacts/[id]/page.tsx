@@ -2,6 +2,7 @@ import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 import { getContactById } from '@/src/features/contacts/services/get-contacts';
 import { getWorksByContactId } from '@/src/features/works/services/get-works';
 import { getRemindersAction } from '@/src/features/reminders/actions/get-reminders';
+import { getMeetingNotesAction } from '@/src/features/meeting-notes/actions/get-meeting-notes';
 import ContactDetailClient from '@/src/features/contacts/components/detail/contact-detail-client';
 import { getCurrentUserAction } from '@/src/features/users/actions/get-user';
 
@@ -26,10 +27,11 @@ export default async function ContactDetailPage({
     );
   }
 
-  const [contact, contactWorks, remindersResult] = await Promise.all([
+  const [contact, contactWorks, remindersResult, meetingNotesResult] = await Promise.all([
     getContactById(supabase, id, userId),
     getWorksByContactId(supabase, id, userId),
     getRemindersAction(id),
+    getMeetingNotesAction(id),
   ]);
 
   if (!contact) {
@@ -45,6 +47,7 @@ export default async function ContactDetailPage({
       contact={contact}
       initialWorks={contactWorks || []}
       initialReminders={remindersResult.data || []}
+      initialMeetingNotes={meetingNotesResult.data || []}
     />
   );
 }

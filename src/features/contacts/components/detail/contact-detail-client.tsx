@@ -7,15 +7,18 @@ import ContactWorkHistory from '@/src/features/contacts/components/detail/contac
 import { AddWorkModal } from '@/src/features/dashboard/components/add-work-modal';
 import EditContactModal from '@/src/features/contacts/components/edit-contact-modal';
 import { ReminderSection } from '@/src/features/reminders/components/reminder-section';
+import { MeetingNotesSection } from '@/src/features/meeting-notes/components/meeting-notes-section';
 
 export default function ContactDetailClient({
   contact,
   initialWorks,
   initialReminders,
+  initialMeetingNotes,
 }: {
   contact: any;
   initialWorks: any[];
   initialReminders: any[];
+  initialMeetingNotes: any[];
 }) {
   const [showAddWorkModal, setShowAddWorkModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -36,7 +39,13 @@ export default function ContactDetailClient({
             initialReminders={initialReminders}
           />
         </div>
-        <ContactWorkHistory contactWorks={initialWorks} />
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <ContactWorkHistory contactWorks={initialWorks} />
+          <MeetingNotesSection
+            contactId={contact.id}
+            initialNotes={initialMeetingNotes}
+          />
+        </div>
       </div>
       <AddWorkModal
         open={showAddWorkModal}
