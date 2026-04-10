@@ -3,13 +3,16 @@ import { HeroSection } from '../features/landing/components/hero-section';
 import { LandingFooter } from '../components/layout/landing/landing-footer';
 import { LandingNav } from '../components/layout/landing/landing-nav';
 import { createClient } from '@/src/utils/supabase/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/src/lib/auth';
 import { redirect } from 'next/navigation';
 
 export default async function Page() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  if (user) {
+  if (user || session) {
     redirect('/dashboard');
   }
 
